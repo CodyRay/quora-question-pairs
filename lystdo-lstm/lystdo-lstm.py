@@ -1,28 +1,10 @@
-'''
-Single model may achieve LB scores at around 0.29+ ~ 0.30+
-Average ensembles can easily get 0.28+ or less
-Don't need to be an expert of feature engineering
-All you need is a GPU!!!!!!!
-
-The code is tested on Keras 2.0.0 using Tensorflow backend, and Python 2.7
-
-According to experiments by kagglers, Theano backend with GPU may give bad LB
-scores while the val_loss seems to be fine, so try Tensorflow backend first
-please
-'''
-
-########################################
-# import packages
-########################################
-
-import re
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import csv
 import codecs
+import pickle
 import numpy as np
-import pandas as pd
-
 from nltk.corpus import stopwords
-from nltk.stem import SnowballStemmer
 
 from gensim.models import KeyedVectors
 from keras.preprocessing.text import Tokenizer
@@ -33,11 +15,7 @@ from keras.models import Model
 from keras.layers.normalization import BatchNormalization
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
-import sys
-import imp
-imp.reload(sys)
-
-seed = 1
+seed = np.random.randint(0, 10000)
 print("Seed: {}".format(seed))
 np.random.seed(seed)
 
@@ -62,71 +40,36 @@ act = 'relu'
 # whether to re-weight classes to fit the 17.5% share in test set
 re_weight = True
 
-STAMP = 'lstm_%d_%d_%.2f_%.2f_seed_%d' % (num_lstm, num_dense, rate_drop_lstm,
-                                          rate_drop_dense, seed)
+STAMP = 'lstm_%d_%d_%.2f_%.2f_seed_%d' % (num_lstm, num_dense, rate_drop_lstm, rate_drop_dense, seed)
+
+print(STAMP)
+
+########################################
+# index word vectors
+########################################
+print('Indexing word vectors')
+
+# How to convert glove files into this format...
+# python -m gensim.scripts.glove2word2vec --input=glove.6B.300d.txt --output=glove.6B.300d.w2v.txt
+# ```
+# from gensim.models.keyedvectors import KeyedVectors
+
+# model = KeyedVectors.load_word2vec_format('glove.6B.300d.w2v.txt', binary=False)
+# model.save_word2vec_format('glove.6B.300d.w2v.bin', binary=True)
+# ```
+word2vec = KeyedVectors.load_word2vec_format(EMBEDDING_FILE,
+                                             binary=True)
+print('Found %s word vectors of word2vec' % len(word2vec.vocab))
 
 ########################################
 # process texts in datasets
 ########################################
 print('Processing text dataset')
 
-# The function "text_to_wordlist" is from
-# https://www.kaggle.com/currie32/quora-question-pairs/the-importance-of-cleaning-text
 
-
-def text_to_wordlist(text, remove_stopwords=False, stem_words=False):
-    # Clean the text, with the option to remove stopwords and to stem words.
-
-    # Convert words to lower case and split them
-    text = text.lower().split()
-
-    # Optionally, remove stop words
-    if remove_stopwords:
-        stops = set(stopwords.words("english"))
-        text = [w for w in text if w not in stops]
-
-    text = " ".join(text)
-
-    # Clean the text
-    text = re.sub(r"[^A-Za-z0-9^,!.\/'+-=]", " ", text)
-    text = re.sub(r"what's", "what is ", text)
-    text = re.sub(r"\'s", " ", text)
-    text = re.sub(r"\'ve", " have ", text)
-    text = re.sub(r"can't", "cannot ", text)
-    text = re.sub(r"n't", " not ", text)
-    text = re.sub(r"i'm", "i am ", text)
-    text = re.sub(r"\'re", " are ", text)
-    text = re.sub(r"\'d", " would ", text)
-    text = re.sub(r"\'ll", " will ", text)
-    text = re.sub(r",", " ", text)
-    text = re.sub(r"\.", " ", text)
-    text = re.sub(r"!", " ! ", text)
-    text = re.sub(r"\/", " ", text)
-    text = re.sub(r"\^", " ^ ", text)
-    text = re.sub(r"\+", " + ", text)
-    text = re.sub(r"\-", " - ", text)
-    text = re.sub(r"\=", " = ", text)
-    text = re.sub(r"'", " ", text)
-    text = re.sub(r"(\d+)(k)", r"\g<1>000", text)
-    text = re.sub(r":", " : ", text)
-    text = re.sub(r" e g ", " eg ", text)
-    text = re.sub(r" b g ", " bg ", text)
-    text = re.sub(r" u s ", " american ", text)
-    text = re.sub(r"\0s", "0", text)
-    text = re.sub(r" 9 11 ", "911", text)
-    text = re.sub(r"e - mail", "email", text)
-    text = re.sub(r"j k", "jk", text)
-    text = re.sub(r"\s{2,}", " ", text)
-
-    # Optionally, shorten words to their stems
-    if stem_words:
-        text = text.split()
-        stemmer = SnowballStemmer('english')
-        stemmed_words = [stemmer.stem(word) for word in text]
-        text = " ".join(stemmed_words)
-
-    # Return a list of words
-    return(text)
+def remove_words(text):  # Removes stop words and words not in word2vec
+    stops = set(stopwords.words("english"))
+    return " ".join([w for w in text.split() if w not in stops and w in word2vec.vocab])
 
 
 texts_1 = []
@@ -136,32 +79,19 @@ with codecs.open(TRAIN_DATA_FILE, encoding='utf-8') as f:
     reader = csv.reader(f, delimiter=',')
     header = next(reader)
     for i, values in enumerate(reader):
-        texts_1.append(text_to_wordlist(values[3]))
-        texts_2.append(text_to_wordlist(values[4]))
+        texts_1.append(remove_words(values[3]))
+        texts_2.append(remove_words(values[4]))
         labels.append(int(values[5]))
 print('Found %s texts in train.csv' % len(texts_1))
 
-test_texts_1 = []
-test_texts_2 = []
-test_ids = []
-with codecs.open(TEST_DATA_FILE, encoding='utf-8') as f:
-    reader = csv.reader(f, delimiter=',')
-    header = next(reader)
-    for i, values in enumerate(reader):
-        if i > 100:
-            break
-        test_texts_1.append(text_to_wordlist(values[1]))
-        test_texts_2.append(text_to_wordlist(values[2]))
-        test_ids.append(values[0])
-print('Found %s texts in test.csv' % len(test_texts_1))
-
 tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
-tokenizer.fit_on_texts(texts_1 + texts_2 + test_texts_1 + test_texts_2)
+tokenizer.fit_on_texts(texts_1 + texts_2)
+
+with open(STAMP + '.tokenizer.p', 'wb') as tokenizer_p:
+    pickle.dump(tokenizer, tokenizer_p)
 
 sequences_1 = tokenizer.texts_to_sequences(texts_1)
 sequences_2 = tokenizer.texts_to_sequences(texts_2)
-test_sequences_1 = tokenizer.texts_to_sequences(test_texts_1)
-test_sequences_2 = tokenizer.texts_to_sequences(test_texts_2)
 
 word_index = tokenizer.word_index
 print('Found %s unique tokens' % len(word_index))
@@ -171,19 +101,6 @@ data_2 = pad_sequences(sequences_2, maxlen=MAX_SEQUENCE_LENGTH)
 labels = np.array(labels)
 print('Shape of data tensor:', data_1.shape)
 print('Shape of label tensor:', labels.shape)
-
-test_data_1 = pad_sequences(test_sequences_1, maxlen=MAX_SEQUENCE_LENGTH)
-test_data_2 = pad_sequences(test_sequences_2, maxlen=MAX_SEQUENCE_LENGTH)
-test_ids = np.array(test_ids)
-
-########################################
-# index word vectors
-########################################
-print('Indexing word vectors')
-
-word2vec = KeyedVectors.load_word2vec_format(EMBEDDING_FILE,
-                                             binary=True)
-print('Found %s word vectors of word2vec' % len(word2vec.vocab))
 
 ########################################
 # prepare embeddings
@@ -269,29 +186,19 @@ model.compile(loss='binary_crossentropy',
 print(STAMP)
 
 early_stopping = EarlyStopping(monitor='val_loss', patience=3)
-bst_model_path = STAMP + '.h5'
+bst_model_weights_path = STAMP + '.h5'
+bst_model_path = STAMP + '.model.h5'
+model_weights_checkpoint = ModelCheckpoint(
+    bst_model_weights_path, save_best_only=True, save_weights_only=True)
 model_checkpoint = ModelCheckpoint(
-    bst_model_path, save_best_only=True, save_weights_only=True)
+    bst_model_path, save_best_only=True)
 
 hist = model.fit([data_1_train, data_2_train], labels_train,
-                 validation_data=([data_1_val, data_2_val],
-                                  labels_val, weight_val),
-                 epochs=200, batch_size=2048, shuffle=True,
+                 validation_data=([data_1_val, data_2_val], labels_val, weight_val),
+                 epochs=400, batch_size=1024, shuffle=True,
                  class_weight=class_weight,
-                 callbacks=[early_stopping, model_checkpoint])
+                 callbacks=[early_stopping, model_checkpoint, model_weights_checkpoint])
 
-model.load_weights(bst_model_path)
+model.load_weights(bst_model_weights_path)
 bst_val_score = min(hist.history['val_loss'])
-
-########################################
-# make the submission
-########################################
-print('Start making the submission before fine-tuning')
-
-preds = model.predict([test_data_1, test_data_2], batch_size=8192, verbose=1)
-preds += model.predict([test_data_2, test_data_1], batch_size=8192, verbose=1)
-preds /= 2
-
-submission = pd.DataFrame({'test_id': test_ids, 'is_duplicate': preds.ravel()})
-submission.to_csv('%.4f_' % (bst_val_score) + STAMP + '.csv', index=False)
-
+print("Best Value Loss = {}".format(bst_val_score))

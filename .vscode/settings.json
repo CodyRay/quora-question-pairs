@@ -1,0 +1,10 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.pythonPath": "C://Users/hoeftc/AppData/Local/conda/conda/envs/tensorflow-gpu/python",
+    "python.linting.flake8Args": [
+        "--max-line-length=120",
+        "--ignore=E402"
+    ]
+}

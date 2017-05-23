@@ -28,7 +28,7 @@ MAX_NB_WORDS = 200000
 VALIDATION_SPLIT = 0.1
 # whether to re-weight classes to fit the 17.5% share in test set
 RE_WEIGHT = True
-STOPPING_PATIENCE = 20
+STOPPING_PATIENCE = 6
 ACT = 'relu'
 
 
