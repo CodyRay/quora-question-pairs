@@ -18,9 +18,8 @@ from keras.layers.normalization import BatchNormalization
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 dir = os.path.dirname(__file__)
-VERSION = 1
 BASE_DIR = os.path.join(dir, '../input/')
-EMBEDDING_FILE = os.path.join(BASE_DIR, 'glove.6B.300d.w2v.bin')
+EMBEDDING_FILE = os.path.join(BASE_DIR, 'glove.840B.300d.w2v.clean.bin')
 EMBEDDING_DIM = 300
 TRAIN_DATA_FILE = os.path.join(BASE_DIR, 'train.csv')
 TEST_DATA_FILE = os.path.join(BASE_DIR, 'test.csv')
@@ -29,7 +28,7 @@ MAX_NB_WORDS = 200000
 VALIDATION_SPLIT = 0.1
 # whether to re-weight classes to fit the 17.5% share in test set
 RE_WEIGHT = True
-STOPPING_PATIENCE = 3
+STOPPING_PATIENCE = 5
 ACT = 'relu'
 
 
@@ -47,8 +46,6 @@ def clean_words(text, allwords, discarding):
         for c in s:
             if c in letters:
                 yield c
-            elif '?' == c:
-                yield ' ? '
             elif "'" == c:
                 pass
             else:
@@ -269,12 +266,18 @@ def model_prediction(model, test_data_1, test_data_2):
 def main():
     s = seed()
 
-    num_gru = np.random.randint(175, 275)
-    num_dense = np.random.randint(100, 150)
-    rate_drop_gru = 0.15 + np.random.rand() * 0.25
-    rate_drop_dense = 0.15 + np.random.rand() * 0.25
+    # Original Params
+    # num_gru = np.random.randint(175, 275)
+    # num_dense = np.random.randint(100, 150)
+    # rate_drop_gru = 0.15 + np.random.rand() * 0.25
+    # rate_drop_dense = 0.15 + np.random.rand() * 0.25
 
-    stamp = 'gru_%d_%d_%d_%.2f_%.2f_seed_%d' % (VERSION, num_gru, num_dense, rate_drop_gru, rate_drop_dense, s)
+    num_gru = np.random.randint(225, 275)
+    num_dense = np.random.randint(100, 125)
+    rate_drop_gru = 0.25 + np.random.rand() * 0.25
+    rate_drop_dense = 0.25 + np.random.rand() * 0.25
+
+    stamp = 'gru_%d_%d_%.2f_%.2f_seed_%d' % (num_gru, num_dense, rate_drop_gru, rate_drop_dense, s)
 
     print(stamp)
     os.mkdir(stamp)
@@ -343,6 +346,7 @@ def fancyProgressBarClear(clear=False):
         print("\r", end='')
     else:
         print()
+
 
 if __name__ == "__main__":
     main()

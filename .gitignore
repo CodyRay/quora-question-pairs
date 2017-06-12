@@ -2,4 +2,5 @@
 *.p 
 *.h5 
 *.bin 
+*.log
 old/* 
