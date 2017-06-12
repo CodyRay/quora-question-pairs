@@ -1,0 +1,162 @@
+% cs434-sp17 final paper, hoeftc and gillenp
+% based on nips_2017.tex
+
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2017
+%
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{nips_2017}
+
+% print author's names
+\usepackage[final]{nips_2017}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
+\title{Finding Quora questions pairs with neural networks}
+
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+
+\author{
+    Cody Ray Hoeft \\
+    School of EECS \\
+    Oregon State University \\
+    Corvallis, OR 97331 \\
+    \texttt{hoeftc@oregonstate.edu} \\
+    \And
+    Padraig Gillen \\
+    School of EECS \\
+    Oregon State University \\
+    Corvallis, OR 97331 \\
+    \texttt{gillenp@oregonstate.edu} \\
+}
+
+\begin{document}
+% \nipsfinalcopy is no longer used
+
+\maketitle
+
+\begin{abstract}
+    The website Quora helps anybody ask questions and answer those they have an understanding of.
+    With a user base of...
+\end{abstract}
+
+\section{Introduction}
+% An introduction section that briefly describes the problem you aimed to solve and a summary of the main results
+
+\section{Approach}
+% One / multiple sections describing the approach(es) you explored for solving the problem.
+% Examples: feature design, preprocessing, and the prediction models etc.
+
+
+\section{Results}
+% section devoted to presenting / discussing the results  obtained from exploration
+% possible discussion topics include:
+%   what worked and what didn't?
+%   How do different methods compare with each other?
+%   what kind of lessons you learned from your exploration?
+%   What are possible ways for future work to improve?
+
+\section{Conclusion}
+% A conclusion section that summarize your project and your effort.
+
+\appendix
+\section{Work Done}
+% appendix describes individual contribution levels to the project
+%    estimated in percentages and described in words
+
+\end{document}
+
+% \subsection{Citations within the text}
+%
+% The \verb+natbib+ package will be loaded for you by default.
+% Citations may be author/year or numeric, as long as you maintain
+% internal consistency.  As to the format of the references themselves,
+% any style is acceptable as long as it is used consistently.
+%
+% The documentation for \verb+natbib+ may be found at
+% \begin{center}
+%     \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
+% \end{center}
+% Of note is the command \verb+\citet+, which produces citations
+% appropriate for use in inline text.  For example,
+% \begin{verbatim}
+%     \citet{hasselmo} investigated\dots
+% \end{verbatim}
+% produces
+% \begin{quote}
+%     Hasselmo, et al.\ (1995) investigated\dots
+% \end{quote}
+%
+% If you wish to load the \verb+natbib+ package with options, you may
+% add the following before loading the \verb+nips_2017+ package:
+% \begin{verbatim}
+%     \PassOptionsToPackage{options}{natbib}
+% \end{verbatim}
+%
+% If \verb+natbib+ clashes with another package you load, you can add
+% the optional argument \verb+nonatbib+ when loading the style file:
+% \begin{verbatim}
+%     \usepackage[nonatbib]{nips_2017}
+% \end{verbatim}
+%
+% As submission is double blind, refer to your own published work in the
+% third person. That is, use ``In the previous work of Jones et
+% al.\ [4],'' not ``In our previous work [4].'' If you cite your other
+% papers that are not widely available (e.g., a journal paper under
+% review), use anonymous author names in the citation, e.g., an author
+% of the form ``A.\ Anonymous.''
+%
+%
+% \subsection{Tables}
+%
+% All tables must be centered, neat, clean and legible.  The table
+% number and title always appear before the table.  See
+% Table~\ref{sample-table}.
+%
+% Place one line space before the table title, one line space after the
+% table title, and one line space after the table. The table title must
+% be lower case (except for first word and proper nouns); tables are
+% numbered consecutively.
+%
+% Note that publication-quality tables \emph{do not contain vertical
+%   rules.} We strongly suggest the use of the \verb+booktabs+ package,
+% which allows for typesetting high-quality, professional tables:
+% \begin{center}
+%   \url{https://www.ctan.org/pkg/booktabs}
+% \end{center}
+% This package was used to typeset Table~\ref{sample-table}.
+%
+% \begin{table}[t]
+%   \caption{Sample table title}
+%   \label{sample-table}
+%   \centering
+%   \begin{tabular}{lll}
+%     \toprule
+%     \multicolumn{2}{c}{Part}                   \\
+%     \cmidrule{1-2}
+%     Name     & Description     & Size ($\mu$m) \\
+%     \midrule
+%     Dendrite & Input terminal  & $\sim$100     \\
+%     Axon     & Output terminal & $\sim$10      \\
+%     Soma     & Cell body       & up to $10^6$  \\
+%     \bottomrule
+%   \end{tabular}
+% \end{table}
