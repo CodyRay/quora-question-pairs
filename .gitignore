@@ -3,4 +3,5 @@
 *.h5 
 *.bin 
 *.log
+env/
 old/* 
