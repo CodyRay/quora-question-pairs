@@ -28,7 +28,7 @@ MAX_NB_WORDS = 200000
 VALIDATION_SPLIT = 0.1
 # whether to re-weight classes to fit the 17.5% share in test set
 RE_WEIGHT = True
-STOPPING_PATIENCE = 5
+STOPPING_PATIENCE = 3
 ACT = 'relu'
 
 
@@ -309,7 +309,7 @@ def model_fit(model, stamp, d1_train, d2_train, labels_train, d1_val, d2_val, la
 
     hist = model.fit([d1_train, d2_train], labels_train,
                      validation_data=([d1_val, d2_val], labels_val, weight_val),
-                     epochs=400, batch_size=1024, shuffle=True,
+                     epochs=20, batch_size=1024, shuffle=True,
                      class_weight=class_weight,
                      callbacks=[early_stopping, model_checkpoint, model_weights_checkpoint])
 

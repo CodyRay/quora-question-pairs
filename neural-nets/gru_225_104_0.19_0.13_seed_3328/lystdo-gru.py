@@ -248,7 +248,7 @@ def model_fit(model, stamp, d1_train, d2_train, labels_train, d1_val, d2_val, la
 
     hist = model.fit([d1_train, d2_train], labels_train,
                      validation_data=([d1_val, d2_val], labels_val, weight_val),
-                     epochs=400, batch_size=1024, shuffle=True,
+                     epochs=20, batch_size=1024, shuffle=True,
                      class_weight=class_weight,
                      callbacks=[early_stopping, model_checkpoint, model_weights_checkpoint])
 

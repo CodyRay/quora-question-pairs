@@ -29,7 +29,7 @@ CHARACTERS_TO_TOKENS = {c: i for i, c in enumerate([CHARACTER_PADDING, CHARACTER
 VALIDATION_SPLIT = 0.1
 # whether to re-weight classes to fit the 17.5% share in test set
 RE_WEIGHT = True
-STOPPING_PATIENCE = 5
+STOPPING_PATIENCE = 3
 ACT = 'relu'
 BATCH_SIZE = 256
 
@@ -224,7 +224,7 @@ def model_fit(model, stamp, d1_train, d2_train, labels_train, d1_val, d2_val, la
 
     hist = model.fit([d1_train, d2_train], labels_train,
                      validation_data=([d1_val, d2_val], labels_val, weight_val),
-                     epochs=400, batch_size=BATCH_SIZE, shuffle=True,
+                     epochs=20, batch_size=BATCH_SIZE, shuffle=True,
                      class_weight=class_weight,
                      callbacks=[early_stopping, model_checkpoint, model_weights_checkpoint])
 
